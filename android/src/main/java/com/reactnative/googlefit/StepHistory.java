@@ -113,7 +113,7 @@ public class StepHistory {
            Fitness.SensorsApi.findDataSources(googleFitManager.getGoogleApiClient(), sourceRequest).await(1, TimeUnit.MINUTES);
 
         dataSources.addAll( dataSourcesResult.getDataSources() );
-        */
+         */
 
         final AtomicInteger dataSourcesToLoad = new AtomicInteger(dataSources.size());
 
@@ -178,7 +178,7 @@ public class StepHistory {
                             ,
                             //DataType.AGGREGATE_STEP_COUNT_DELTA
                             aggregateType)
-                        .bucketByTime(12, TimeUnit.HOURS) // Half-day resolution
+                        .bucketByActivitySegment(5, TimeUnit.MINUTES)
                         .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                         .build();
             } else {
@@ -278,6 +278,20 @@ public class StepHistory {
             Log.i(TAG, "\t\tType : " + dp.getDataType().getName());
             Log.i(TAG, "\t\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
             Log.i(TAG, "\t\tEnd  : " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+
+            DataSource ds = dp.getOriginalDataSource();
+            String streamId = ds.getStreamIdentifier();
+            Log.i(TAG, "\t\tOriginalSource  : " + streamId);
+
+            if (streamId.toLowerCase().indexOf("user_input") != -1) {
+                Log.i(TAG, " ----- excluded as it was manually entered -----");
+
+                for(Field field : dp.getDataType().getFields()) {
+                    Log.i(TAG, "\t\tField: " + field.getName() +
+                            " Value: " + dp.getValue(field));
+                }
+                continue;
+            }
 
             for(Field field : dp.getDataType().getFields()) {
                 Log.i(TAG, "\t\tField: " + field.getName() +
