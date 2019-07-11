@@ -113,7 +113,7 @@ public class StepHistory {
            Fitness.SensorsApi.findDataSources(googleFitManager.getGoogleApiClient(), sourceRequest).await(1, TimeUnit.MINUTES);
 
         dataSources.addAll( dataSourcesResult.getDataSources() );
-         */
+        */
 
         final AtomicInteger dataSourcesToLoad = new AtomicInteger(dataSources.size());
 
