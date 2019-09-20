@@ -101,6 +101,16 @@ public class StepHistory {
                 .build()
         );
 
+
+        dataSources.add(
+            new DataSource.Builder()
+                .setAppPackageName("com.google.android.apps.fitness")
+                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                .setType(DataSource.TYPE_RAW)
+                .setStreamName("user_input")
+                .build()
+        );
+
         /*
         DataSourcesRequest sourceRequest = new DataSourcesRequest.Builder()
                 .setDataTypes(DataType.TYPE_STEP_COUNT_DELTA,
@@ -178,7 +188,7 @@ public class StepHistory {
                             ,
                             //DataType.AGGREGATE_STEP_COUNT_DELTA
                             aggregateType)
-                        .bucketByActivitySegment(5, TimeUnit.MINUTES)
+                        .bucketByTime(12, TimeUnit.HOURS) // Half-day resolution
                         .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                         .build();
             } else {
@@ -278,20 +288,6 @@ public class StepHistory {
             Log.i(TAG, "\t\tType : " + dp.getDataType().getName());
             Log.i(TAG, "\t\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
             Log.i(TAG, "\t\tEnd  : " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
-
-            DataSource ds = dp.getOriginalDataSource();
-            String streamId = ds.getStreamIdentifier();
-            Log.i(TAG, "\t\tOriginalSource  : " + streamId);
-
-            if (streamId.toLowerCase().indexOf("user_input") != -1) {
-                Log.i(TAG, " ----- excluded as it was manually entered -----");
-
-                for(Field field : dp.getDataType().getFields()) {
-                    Log.i(TAG, "\t\tField: " + field.getName() +
-                            " Value: " + dp.getValue(field));
-                }
-                continue;
-            }
 
             for(Field field : dp.getDataType().getFields()) {
                 Log.i(TAG, "\t\tField: " + field.getName() +
