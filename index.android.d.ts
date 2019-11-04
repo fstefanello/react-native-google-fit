@@ -54,6 +54,16 @@ declare module 'react-native-google-fit' {
     ): void
 
     /**
+     * Get Session samples over a specified date range.
+     * @param {Object} options 
+     * @callback {Function} callback The function will be called with an array of elements.
+     */
+    getSessionSamples(
+      options: any,
+      callback: (isError: boolean, result: any) => void
+    ): void
+
+    /**
      * Get the total calories per day over a specified date range.
      * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
      * @callback {Function} callback The function will be called with an array of elements.

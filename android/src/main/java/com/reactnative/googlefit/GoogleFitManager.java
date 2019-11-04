@@ -157,7 +157,7 @@ public class GoogleFitManager implements
                                 Log.i(TAG, "Authorization - Failed Authorization Mgr:" + connectionResult);
                                 if (mAuthInProgress) {
                                     Log.i(TAG, "Authorization - Already attempting to resolve an error.");
-                                } else if (connectionResult.hasResolution()) {
+                                } else if ((connectionResult != null) && (mActivity != null) && connectionResult.hasResolution()) {
                                     try {
                                         mAuthInProgress = true;
                                         connectionResult.startResolutionForResult(mActivity, REQUEST_OAUTH);
@@ -181,7 +181,7 @@ public class GoogleFitManager implements
         mApiClient.connect();
     }
 
-    public void  disconnect() {
+    public void disconnect() {
         GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(mReactContext, new Scope(Scopes.FITNESS_ACTIVITY_READ));
         Fitness.getConfigClient(mReactContext, gsa).disableFit();
         mApiClient.disconnect();
