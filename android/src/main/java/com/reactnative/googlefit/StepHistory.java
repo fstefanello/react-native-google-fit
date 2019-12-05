@@ -11,8 +11,8 @@
 
 package com.reactnative.googlefit;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -57,6 +57,104 @@ public class StepHistory {
     public StepHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
         this.mReactContext = reactContext;
         this.googleFitManager = googleFitManager;
+    }
+
+    public void getUserFullInfoSteps(long startTime, long endTime, final Callback successCallback) {
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+
+        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+
+        final DataReadRequest readRequest = new DataReadRequest.Builder()
+        .read(DataType.TYPE_STEP_COUNT_DELTA)
+        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+        .build();
+
+        DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+        DataSet stepData = dataReadResult.getDataSet(DataType.TYPE_STEP_COUNT_DELTA);
+
+        WritableArray map = Arguments.createArray();
+
+        for (DataPoint dp : stepData.getDataPoints()) {
+            WritableMap stepMap = Arguments.createMap();
+
+            // Log.i(TAG, "\tData point:");
+            // Log.i(TAG, "\t\tType : " + dp.getDataType().getName());
+            // Log.i(TAG, "\t\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            // Log.i(TAG, "\t\tEnd  : " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+            // Log.i(TAG, "\t\tSouce: " + dp.getOriginalDataSource().getDataType());
+            // Log.i(TAG, "\t\tSouce: " + dp.getOriginalDataSource().getDataType().getName());
+            // Log.i(TAG, "\t\tSoucestram: " + dp.getOriginalDataSource().getStreamName());
+
+            // Log.i(TAG, "\t\tSouce: " + dp.getDataSource().getDevice().getModel());
+            // Log.i(TAG, "\t\tSoucegetype: " + dp.getOriginalDataSource().getType());
+            // Log.i(TAG, "\t\tSoucepackname: " + dp.getOriginalDataSource().getAppPackageName());
+
+            // stepMap.putString("type", dp.getDataType().getName());
+
+            // stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
+            // stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
+
+            stepMap.putString("startDate", dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            stepMap.putString("endDate", dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+
+            DataSource ds = dp.getOriginalDataSource();
+
+            stepMap.putString("streamName", ds.getStreamName());
+            stepMap.putString("packageName", ds.getAppPackageName());
+            stepMap.putString("streamIdentifier", ds.getStreamIdentifier());
+
+            try {
+                String device = "";
+                String model = ds.getDevice().getModel();
+                String manuf = ds.getDevice().getManufacturer();
+                device = manuf + ":" + model;
+                stepMap.putString("device", device);
+            } catch (Exception e) {}
+
+            for (Field field : dp.getDataType().getFields()) {
+                // Log.i(TAG, "\t\tField: " + field.getName() + " Value: " + dp.getValue(field));
+                stepMap.putDouble(field.getName(), dp.getValue(field).asInt());
+            }
+            map.pushMap(stepMap);
+        }
+
+        successCallback.invoke(map);
+    }
+
+    public void getUserInputSteps(long startTime, long endTime, final Callback successCallback) {
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+
+        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+
+        final DataReadRequest readRequest = new DataReadRequest.Builder()
+            .read(DataType.TYPE_STEP_COUNT_DELTA)
+            .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+            .build();
+
+        DataReadResult dataReadResult =
+            Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+        DataSet stepData = dataReadResult.getDataSet(DataType.TYPE_STEP_COUNT_DELTA);
+
+        int userInputSteps = 0;
+
+        for (DataPoint dp : stepData.getDataPoints()) {
+            for(Field field : dp.getDataType().getFields()) {
+                if("user_input".equals(dp.getOriginalDataSource().getStreamName())){
+                    int steps = dp.getValue(field).asInt();
+                    userInputSteps += steps;
+                }
+            }
+        }
+
+        successCallback.invoke(userInputSteps);
     }
 
     public void aggregateDataByDate(long startTime, long endTime, final Callback successCallback) {

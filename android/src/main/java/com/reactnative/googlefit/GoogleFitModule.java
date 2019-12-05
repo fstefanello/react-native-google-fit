@@ -108,9 +108,14 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void disconnect() {
-        if (mGoogleFitManager != null) {
-            mGoogleFitManager.disconnect();
+    public void disconnect(Promise promise) {
+        try {
+            if (mGoogleFitManager != null) {
+                mGoogleFitManager.disconnect(getCurrentActivity());
+            }
+            promise.resolve(null);
+        } catch (Exception e) {
+            promise.reject(e);
         }
     }
 
@@ -155,6 +160,31 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
 
         try {
             successCallback.invoke(mGoogleFitManager.getActivityHistory().getActivitySamples((long)startDate, (long)endDate));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+    @ReactMethod
+    public void getUserFullInfoSteps(double startDate,
+                                double endDate,
+                                Callback errorCallback,
+                                Callback successCallback) {
+
+        try {
+            mGoogleFitManager.getStepHistory().getUserFullInfoSteps((long) startDate, (long) endDate, successCallback);
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void getUserInputSteps(double startDate,
+                                double endDate,
+                                Callback errorCallback,
+                                Callback successCallback) {
+
+        try {
+            mGoogleFitManager.getStepHistory().getUserInputSteps((long) startDate, (long) endDate, successCallback);
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
