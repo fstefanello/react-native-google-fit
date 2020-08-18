@@ -247,6 +247,40 @@ class RNGoogleFit {
   }
 
   /**
+   * Get the total steps per day over a specified date range.
+   * @param {Object} options getUserInputSteps accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+   * @param {Function} callback The function will be called with an array of elements.
+   */
+
+  getUserFullInfoSteps = (options, callback) => {
+    const startDate = !isNil(options.startDate) ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
+    const endDate = !isNil(options.endDate) ? Date.parse(options.endDate) : (new Date()).valueOf()
+    googleFit.getUserFullInfoSteps(startDate, endDate,
+      (msg) => callback(msg, false),
+      (res) => {
+        callback(null, res);
+      }
+    )
+  }
+
+  /**
+   * Get the total steps per day over a specified date range.
+   * @param {Object} options getUserInputSteps accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+   * @param {Function} callback The function will be called with an array of elements.
+   */
+
+  getUserInputSteps = (options, callback) => {
+    const startDate = !isNil(options.startDate) ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
+    const endDate = !isNil(options.endDate) ? Date.parse(options.endDate) : (new Date()).valueOf()
+    googleFit.getUserInputSteps(startDate, endDate,
+      (msg) => callback(msg, false),
+      (res) => {
+        callback(null, res);
+      }
+    )
+  }
+
+  /**
    * Get the total distance per day over a specified date range.
    * @param {Object} options getDailyDistanceSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
    * @param {function} callback The function will be called with an array of elements.
@@ -287,6 +321,23 @@ class RNGoogleFit {
           callback(false, res)
         } else {
           callback('There is no any distance data for this period', false)
+        }
+      }
+    )
+  }
+
+  getSessionSamples(options, callback) {
+    googleFit.getSessionSamples(
+      options.startDate,
+      options.endDate,
+      error => {
+        callback(error, false)
+      },
+      res => {
+        if (res.length > 0) {
+          callback(false, res)
+        } else {
+          callback('There is no session data for this period', false)
         }
       }
     )
@@ -442,6 +493,10 @@ class RNGoogleFit {
   }
 
   deleteWeight = (options, callback) => {
+    if (options.unit === 'pound') {
+      options.value = lbsAndOzToK({ pounds: options.value, ounces: 0 }) //convert pounds and ounces to kg
+    }
+    options.date = Date.parse(options.date)
     googleFit.deleteWeight(
       prepareDeleteOptions(options),
       msg => {
@@ -454,6 +509,7 @@ class RNGoogleFit {
   }
 
   deleteHeight = (options, callback) => {
+    options.date = Date.parse(options.date)
     googleFit.deleteHeight(
       prepareDeleteOptions(options),
       msg => {
@@ -638,8 +694,8 @@ class RNGoogleFit {
         }
       }
     )
-  }
 
+  }
 }
 
 export default new RNGoogleFit()

@@ -166,7 +166,7 @@ public class GoogleFitManager implements
                                 Log.i(TAG, "Authorization - Failed Authorization Mgr:" + connectionResult);
                                 if (mAuthInProgress) {
                                     Log.i(TAG, "Authorization - Already attempting to resolve an error.");
-                                } else if (connectionResult.hasResolution()) {
+                                } else if ((connectionResult != null) && (mActivity != null) && connectionResult.hasResolution()) {
                                     try {
                                         mAuthInProgress = true;
                                         connectionResult.startResolutionForResult(mActivity, REQUEST_OAUTH);
@@ -280,6 +280,7 @@ public class GoogleFitManager implements
 
     /* Creates a dialog for an error message */
     private void showErrorDialog(int errorCode) {
+        if (mActivity == null) return;
         // Create a fragment for the error dialog
         GoogleFitCustomErrorDialig dialogFragment = new GoogleFitCustomErrorDialig();
         // Pass the error that should be displayed

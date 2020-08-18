@@ -174,7 +174,10 @@ A React Native bridge module for interacting with Google Fit
     ```javascript
     [
       {
+<<<<<<< HEAD
         "addedBy": "app_package_name",
+=======
+>>>>>>> c526051a3a77934b155b46083099ae1d6074bf99
         "value":72,
         "endDate":"2019-06-29T15:02:23.413Z",
         "startDate":"2019-06-29T15:02:23.413Z",

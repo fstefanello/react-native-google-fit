@@ -91,6 +91,72 @@ public class StepHistory {
         return bucketUnit;
     }
 
+    public void getUserFullInfoSteps(long startTime, long endTime, final Callback successCallback) {
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+
+        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+
+        final DataReadRequest readRequest = new DataReadRequest.Builder()
+        .read(DataType.TYPE_STEP_COUNT_DELTA)
+        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+        .build();
+
+        DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+        DataSet stepData = dataReadResult.getDataSet(DataType.TYPE_STEP_COUNT_DELTA);
+
+        WritableArray map = Arguments.createArray();
+
+        for (DataPoint dp : stepData.getDataPoints()) {
+            WritableMap stepMap = Arguments.createMap();
+
+            // Log.i(TAG, "\tData point:");
+            // Log.i(TAG, "\t\tType : " + dp.getDataType().getName());
+            // Log.i(TAG, "\t\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            // Log.i(TAG, "\t\tEnd  : " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+            // Log.i(TAG, "\t\tSouce: " + dp.getOriginalDataSource().getDataType());
+            // Log.i(TAG, "\t\tSouce: " + dp.getOriginalDataSource().getDataType().getName());
+            // Log.i(TAG, "\t\tSoucestram: " + dp.getOriginalDataSource().getStreamName());
+
+            // Log.i(TAG, "\t\tSouce: " + dp.getDataSource().getDevice().getModel());
+            // Log.i(TAG, "\t\tSoucegetype: " + dp.getOriginalDataSource().getType());
+            // Log.i(TAG, "\t\tSoucepackname: " + dp.getOriginalDataSource().getAppPackageName());
+
+            // stepMap.putString("type", dp.getDataType().getName());
+
+            // stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
+            // stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
+
+            stepMap.putString("startDate", dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            stepMap.putString("endDate", dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+
+            DataSource ds = dp.getOriginalDataSource();
+
+            stepMap.putString("streamName", ds.getStreamName());
+            stepMap.putString("packageName", ds.getAppPackageName());
+            stepMap.putString("streamIdentifier", ds.getStreamIdentifier());
+
+            try {
+                String device = "";
+                String model = ds.getDevice().getModel();
+                String manuf = ds.getDevice().getManufacturer();
+                device = manuf + ":" + model;
+                stepMap.putString("device", device);
+            } catch (Exception e) {}
+
+            for (Field field : dp.getDataType().getFields()) {
+                // Log.i(TAG, "\t\tField: " + field.getName() + " Value: " + dp.getValue(field));
+                stepMap.putDouble(field.getName(), dp.getValue(field).asInt());
+            }
+            map.pushMap(stepMap);
+        }
+
+        successCallback.invoke(map);
+    }
+
     public void getUserInputSteps(long startTime, long endTime, final Callback successCallback) {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -172,6 +238,16 @@ public class StepHistory {
                 .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
                 .setType(DataSource.TYPE_RAW)
                 .setStreamName("")
+                .build()
+        );
+
+
+        dataSources.add(
+            new DataSource.Builder()
+                .setAppPackageName("com.google.android.apps.fitness")
+                .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                .setType(DataSource.TYPE_RAW)
+                .setStreamName("user_input")
                 .build()
         );
 

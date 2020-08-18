@@ -157,6 +157,44 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
             errorCallback.invoke(e.getMessage());
         }
     }
+    @ReactMethod
+    public void getUserFullInfoSteps(double startDate,
+                                double endDate,
+                                Callback errorCallback,
+                                Callback successCallback) {
+
+        try {
+            mGoogleFitManager.getStepHistory().getUserFullInfoSteps((long) startDate, (long) endDate, successCallback);
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void getUserInputSteps(double startDate,
+                                double endDate,
+                                Callback errorCallback,
+                                Callback successCallback) {
+
+        try {
+            mGoogleFitManager.getStepHistory().getUserInputSteps((long) startDate, (long) endDate, successCallback);
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void getSessionSamples(double startDate,
+                                   double endDate,
+                                   Callback errorCallback,
+                                   Callback successCallback) {
+
+        try {
+            successCallback.invoke(mGoogleFitManager.getActivityHistory().getSessionSamples((long)startDate, (long)endDate));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
 
     @ReactMethod
     public void getUserInputSteps(double startDate,

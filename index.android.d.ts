@@ -20,6 +20,8 @@ declare module 'react-native-google-fit' {
      */
     startRecording: (callback: (param: any) => void, dataTypes: Array<'step' | 'distance' | 'activity'>) => void
 
+    getSteps(dayStart: Date | string, dayEnd: Date | string): any
+
     /**
      * A shortcut to get the total steps of a given day by using getDailyStepCountSamples
      * @param {Date} date optional param, new Date() will be used if date is not provided
@@ -43,6 +45,8 @@ declare module 'react-native-google-fit' {
       callback?: (isError: boolean, result: StepsResponse[]) => void
     ) => Promise<StepsResponse[]>
 
+    buildDailySteps(steps: any): { date: any; value: any }[]
+
     /**
      * Get the total distance per day over a specified date range.
      * @param {Object} options getDailyDistanceSamples accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
@@ -54,12 +58,23 @@ declare module 'react-native-google-fit' {
       callback: (isError: boolean, result: DistanceResponse[]) => void
     ): void
 
-    /**
-     * Get the total steps per day over a specified date range.
-      * @param {Object} options getUserInputSteps accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+      * @param {Object} options getUserFullInfoSteps accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
       * @param {Function} callback The function will be called with an array of elements.
       */
-    getUserInputSteps: (options: Partial<StartAndEndDate>, callback: (isError?: boolean, result?: number)=> void ) => void;
+    getUserFullInfoSteps: (options: {
+        startDate: string,
+        endDate: string,
+    }, callback: (isError?: boolean, result?: number)=> void ) => void;
+
+    /**
+     * Get the total steps per day over a specified date range.
+      * @param {Object} options getUserInputSteps accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+      * @param {Function} callback The function will be called with an array of elements.
+      */
+    getUserInputSteps: (options: {
+        startDate: string,
+        endDate: string,
+    }, callback: (isError?: boolean, result?: number)=> void ) => void;
 
     /**
      * Get the total distance per day over a specified date range.
@@ -69,6 +84,16 @@ declare module 'react-native-google-fit' {
     getActivitySamples(
       options: StartAndEndDate,
       callback: (isError: boolean, result: ActivitySampleResponse[]) => void
+    ): void
+
+    /**
+     * Get Session samples over a specified date range.
+     * @param {Object} options 
+     * @callback {Function} callback The function will be called with an array of elements.
+     */
+    getSessionSamples(
+      options: any,
+      callback: (isError: boolean, result: any) => void
     ): void
 
     /**
@@ -164,8 +189,6 @@ declare module 'react-native-google-fit' {
       callback?: (isError: boolean, result: any) => void
     ) => Promise<any> | void
 
-
-
     isAvailable(callback: (isError: boolean, result: boolean) => void): void
 
     isEnabled(callback: (isError: boolean, result: boolean) => void): void
@@ -184,6 +207,9 @@ declare module 'react-native-google-fit' {
 
     unsubscribeListeners: () => void
 
+    lbsAndOzToK(imperial: any): any
+
+    KgToLbs(metric: any): any
   }
   type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
   export type WeightSample = {
