@@ -292,10 +292,15 @@ class RNGoogleFit {
       : new Date().setHours(0, 0, 0, 0)
     const endDate = !isNil(options.endDate)
       ? Date.parse(options.endDate)
-      : new Date().valueOf()
+      : new Date().valueOf();
+    const bucketInterval = options.bucketInterval || 1;
+    const bucketUnit = options.bucketUnit || "DAY";
+
     googleFit.getDailyDistanceSamples(
       startDate,
       endDate,
+      bucketInterval,
+      bucketUnit,
       msg => {
         callback(msg, false)
       },
@@ -355,10 +360,15 @@ class RNGoogleFit {
     const basalCalculation = options.basalCalculation !== false
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
+    const bucketInterval = options.bucketInterval || 1
+    const bucketUnit = options.bucketUnit || "DAY"
+
     googleFit.getDailyCalorieSamples(
       startDate,
       endDate,
       basalCalculation,
+      bucketInterval,
+      bucketUnit,
       msg => {
         callback(msg, false)
       },
@@ -375,9 +385,13 @@ class RNGoogleFit {
   getDailyNutritionSamples(options, callback) {
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
+    const bucketInterval = options.bucketInterval || 1
+    const bucketUnit = options.bucketUnit || "DAY"
     googleFit.getDailyNutritionSamples(
       startDate,
       endDate,
+      bucketInterval,
+      bucketUnit,
       msg => {
         callback(msg, false)
       },
@@ -589,9 +603,13 @@ class RNGoogleFit {
   getHeartRateSamples(options, callback) {
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
+    const bucketInterval = options.bucketInterval || 1
+    const bucketUnit = options.bucketUnit || "DAY"
     googleFit.getHeartRateSamples(
       startDate,
       endDate,
+      bucketInterval,
+      bucketUnit,
       msg => {
         callback(msg, false)
       },
@@ -608,9 +626,13 @@ class RNGoogleFit {
   getBloodPressureSamples(options, callback) {
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
+    const bucketInterval = options.bucketInterval || 1
+    const bucketUnit = options.bucketUnit || "DAY"
     googleFit.getBloodPressureSamples(
       startDate,
       endDate,
+      bucketInterval,
+      bucketUnit,
       msg => {
         callback(msg, false)
       },
