@@ -73,6 +73,14 @@ public class StepHistory {
         return bucketTime;
     }
 
+    public boolean getBucketRaw(ReadableMap configs) {
+        boolean bucketRaw = false;
+        if (null != configs && configs.hasKey("bucketRaw")) {
+            bucketRaw = configs.getBoolean("bucketRaw");
+        }
+        return bucketRaw;
+    }
+
     public TimeUnit getBucketUnit(ReadableMap configs) {
         TimeUnit bucketUnit = TimeUnit.HOURS;
         if(null != configs && configs.hasKey("bucketUnit")) {
@@ -188,14 +196,19 @@ public class StepHistory {
         // Half-day resolution
         int bucketTime = 12;
         TimeUnit bucketUnit = TimeUnit.HOURS;
+        boolean bucketRaw = false;
 
         if(null != configs) {
             bucketTime = this.getBucketTime(configs);
             bucketUnit = this.getBucketUnit(configs);
+            bucketRaw = this.getBucketRaw(configs);
         }
 
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
         Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+        Log.i(TAG, "BucketTime: " + bucketTime);
+        Log.i(TAG, "BucketUnit: " + bucketUnit);
+        Log.i(TAG, "BucketRaw: " + bucketRaw);
 
         final WritableArray results = Arguments.createArray();
 
@@ -301,7 +314,7 @@ public class StepHistory {
             DataReadRequest readRequest;
 
             List<DataType> aggregateDataTypeList = DataType.getAggregatesForInput(type);
-            if (aggregateDataTypeList.size() > 0) {
+            if (bucketRaw == false && aggregateDataTypeList.size() > 0) {
                 DataType aggregateType = aggregateDataTypeList.get(0);
                 Log.i(TAG, "  + Aggregate : " + aggregateType);
 
@@ -398,7 +411,27 @@ public class StepHistory {
 
                 stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
+                stepMap.putString("startDateFormated", dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+                stepMap.putString("endDateFormated", dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
                 stepMap.putDouble("steps", dp.getValue(field).asInt());
+                DataSource ds = dp.getOriginalDataSource();
+
+                stepMap.putString("streamName", ds.getStreamName());
+                stepMap.putString("packageName", ds.getAppPackageName());
+                stepMap.putString("streamIdentifier", ds.getStreamIdentifier());
+
+                try {
+                    String device = "";
+                    String model = ds.getDevice().getModel();
+                    String manuf = ds.getDevice().getManufacturer();
+                    device = manuf + ":" + model;
+                    stepMap.putString("device", device);
+                } catch (Exception e) {}
+
+                for (Field field2 : dp.getDataType().getFields()) {
+                    // Log.i(TAG, "\t\tField: " + field.getName() + " Value: " + dp.getValue(field));
+                    stepMap.putDouble(field.getName(), dp.getValue(field2).asInt());
+                }
                 map.pushMap(stepMap);
             }
         }

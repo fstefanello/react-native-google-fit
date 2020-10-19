@@ -20,7 +20,6 @@ declare module 'react-native-google-fit' {
      */
     startRecording: (callback: (param: any) => void, dataTypes: Array<'step' | 'distance' | 'activity'>) => void
 
-    getSteps(dayStart: Date | string, dayEnd: Date | string): any
 
     /**
      * A shortcut to get the total steps of a given day by using getDailyStepCountSamples
@@ -45,7 +44,6 @@ declare module 'react-native-google-fit' {
       callback?: (isError: boolean, result: StepsResponse[]) => void
     ) => Promise<StepsResponse[]>
 
-    buildDailySteps(steps: any): { date: any; value: any }[]
 
     /**
      * Get the total distance per day over a specified date range.
@@ -68,13 +66,10 @@ declare module 'react-native-google-fit' {
 
     /**
      * Get the total steps per day over a specified date range.
-      * @param {Object} options getUserInputSteps accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+      * @param {Object} options getUserInputSteps accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
       * @param {Function} callback The function will be called with an array of elements.
       */
-    getUserInputSteps: (options: {
-        startDate: string,
-        endDate: string,
-    }, callback: (isError?: boolean, result?: number)=> void ) => void;
+    getUserInputSteps: (options: Partial<StartAndEndDate>, callback: (isError?: boolean, result?: number)=> void ) => void;
 
     /**
      * Get the total distance per day over a specified date range.
@@ -207,9 +202,6 @@ declare module 'react-native-google-fit' {
 
     unsubscribeListeners: () => void
 
-    lbsAndOzToK(imperial: any): any
-
-    KgToLbs(metric: any): any
   }
 
   type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";

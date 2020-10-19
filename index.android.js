@@ -178,6 +178,7 @@ class RNGoogleFit {
       msg => callback(msg, false),
       res => {
         if (res.length > 0) {
+
           callback(
             false,
             res.map(function(dev) {

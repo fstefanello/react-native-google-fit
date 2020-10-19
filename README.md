@@ -121,11 +121,21 @@ A React Native bridge module for interacting with Google Fit
       { source: "com.xiaomi.hm.health", steps: [] }
     ];
     ```
-   **Note:** bucket Config for step reflects on `rawStep` entity.
-   
+    Step also support a optional config to get rawStep Data for detail usage.
+    ```javascript
+    const dailyOptions = {
+        startDate: "2020-07-06T00:00:00.000Z",
+        endDate:  "2020-07-06T23:59:00.000Z",
+        // optional
+        configs:{
+        bucketTime: 15,
+        bucketUnit: 'MINUTE' | 'HOUR' | 'SECOND' | 'DAY'  // must all CAPITALIZE
+        }
+    }
+   ```
    **Response:**
    ```javascript
-   // {bucketInterval: 15, bucketUnit: 'MINUTE'}
+   // {bucketTime: 15, bucketUnit: 'MINUTE'}
    [
       { source: "com.google.android.gms:estimated_steps", 
         steps: [
@@ -143,7 +153,7 @@ A React Native bridge module for interacting with Google Fit
       },
     ]
     
-    // {bucketInterval: 1, bucketUnit: 'DAY'}
+    // {bucketTime: 1, bucketUnit: 'DAY'}
     [
         { source: "com.google.android.gms:estimated_steps",
             ...
@@ -174,10 +184,7 @@ A React Native bridge module for interacting with Google Fit
     ```javascript
     [
       {
-<<<<<<< HEAD
         "addedBy": "app_package_name",
-=======
->>>>>>> c526051a3a77934b155b46083099ae1d6074bf99
         "value":72,
         "endDate":"2019-06-29T15:02:23.413Z",
         "startDate":"2019-06-29T15:02:23.413Z",
